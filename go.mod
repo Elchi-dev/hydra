@@ -1,6 +1,6 @@
 module github.com/Elchi-dev/hydra
 
-go 1.23.4
+go 1.22
 
 require (
 	github.com/sirupsen/logrus v1.7.0

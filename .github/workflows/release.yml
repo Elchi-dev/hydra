@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+          cache: true
+
+      - name: Build binaries
+        run: |
+          version="${GITHUB_REF_NAME}"
+          mkdir -p dist
+          for target in linux/amd64 linux/arm64; do
+            os="${target%/*}"
+            arch="${target#*/}"
+            name="hydra-${version}-${os}-${arch}"
+            mkdir -p "dist/${name}"
+            CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build -trimpath -ldflags "-s -w" -o "dist/${name}/hydra" ./cmd/hydra
+            CGO_ENABLED=0 GOOS="$os" GOARCH="$arch" go build -trimpath -ldflags "-s -w" -o "dist/${name}/hydractl" ./cmd/hydractl
+            cp README.md LICENSE NOTICE CHANGELOG.md config.example.yaml "dist/${name}/"
+            tar -czf "dist/${name}.tar.gz" -C dist "${name}"
+          done
+
+      - name: Extract release notes
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v ver="$version" '
+            $0 ~ "^## \\[" ver "\\]" { p = 1; next }
+            p && /^## \[/ { exit }
+            p { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "Release ${GITHUB_REF_NAME}" > RELEASE_NOTES.md
+          fi
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.tar.gz
+          body_path: RELEASE_NOTES.md
