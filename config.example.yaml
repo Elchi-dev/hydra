@@ -1,0 +1,74 @@
+# Hydra relay configuration.
+# Copy to hydra.yaml and edit. Restart hydra after changing this file.
+
+server:
+  rtmp_listen: ":1935"           # where OBS connects
+  http_listen: "127.0.0.1:8090"  # dashboard + API (keep on localhost / VPN!)
+  control_socket: "/run/hydra/hydra.sock"  # hydractl talks to this locally
+  ingest_app: "live"             # rtmp://<host>:1935/live/<stream_key>
+  stream_key: "CHANGE-ME-super-secret"     # what OBS authenticates with
+  ffmpeg_path: "ffmpeg"
+  api_token: ""                  # optional: protect the HTTP API/dashboard with a bearer token
+
+brb:
+  enabled: true
+  source: "/var/lib/hydra/brb.mp4"  # looped while OBS is disconnected
+  grace_seconds: 2                  # wait this long after a drop before cutting to BRB
+  hold_seconds: 120                 # keep outputs alive on BRB this long, then stop
+
+logging:
+  level: "info"   # debug | info | warn | error
+
+# Targets are fully modular. `platform` picks a preset that fills in sane
+# defaults (URL, bitrate, resolution); anything you set explicitly overrides it.
+# Add a new platform by adding a target with platform: custom and your own URL.
+targets:
+  - name: twitch
+    enabled: true
+    platform: twitch
+    # url comes from the twitch preset; paste your key:
+    key: "live_xxxxxxxxxxxxxxxxxxxx"
+    mode: transcode
+    video:
+      bitrate: 6000k
+      resolution: 1920x1080
+      fps: 60
+      preset: veryfast       # ultrafast..veryslow (CPU vs quality)
+      gop: 2s
+    audio:
+      bitrate: 160k
+
+  - name: youtube
+    enabled: true
+    platform: youtube
+    key: "xxxx-xxxx-xxxx-xxxx-xxxx"
+    mode: transcode
+    video:
+      bitrate: 9000k
+      resolution: 1920x1080
+      fps: 60
+    audio:
+      bitrate: 192k
+
+  # Vertical 9:16 for TikTok. URL + key come from TikTok LIVE Studio.
+  - name: tiktok
+    enabled: false
+    platform: tiktok
+    url: "rtmp://your-tiktok-ingest/live"
+    key: "paste-from-tiktok"
+    mode: transcode
+    video:
+      bitrate: 4000k
+      resolution: 720x1280
+      fps: 30
+    audio:
+      bitrate: 128k
+
+  # Example: a self-hosted / friend's RTMP server, passed through 1:1 (no
+  # re-encode = almost free). Great for archiving to a local SRS/nginx-rtmp.
+  - name: archive
+    enabled: false
+    platform: custom
+    url: "rtmp://127.0.0.1:1936/archive"
+    key: "rec"
+    mode: copy

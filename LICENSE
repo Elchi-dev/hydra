@@ -1,0 +1,72 @@
+HYDRA SOURCE-AVAILABLE LICENSE
+Version 1.0
+
+Copyright (c) 2026 Elchi. All rights reserved.
+Made by Elchi.
+
+1. DEFINITIONS
+
+   "Software" means the Hydra source code, binaries, documentation, and all
+   associated files in this repository.
+
+   "Licensor" means Elchi, the copyright holder, or any successor or assignee to
+   whom the Licensor has transferred rights under Section 7.
+
+   "You" means any individual or entity accessing the Software.
+
+   "Change Date" means the date occurring one (1) year after the first public
+   release of version 1.0.0 of the Software.
+
+   "Change License" means the Apache License, Version 2.0, or any other license
+   the Licensor designates in writing prior to the Change Date.
+
+2. GRANT OF RIGHTS
+
+   The source code of the Software is made available for viewing and reference
+   only. No other rights are granted. You may not use, copy, run, modify, merge,
+   publish, distribute, sublicense, sell, or create derivative works of the
+   Software, in whole or in part, without the prior written permission of the
+   Licensor.
+
+3. RESERVATION OF RIGHTS
+
+   All rights not expressly granted are reserved by the Licensor. Viewing the
+   source code does not grant any license to its functionality, design, or
+   implementation.
+
+4. CONVERSION ON THE CHANGE DATE
+
+   On the Change Date, the terms of this License applicable to the version of the
+   Software released at that time, and to all prior versions, automatically and
+   permanently convert to the Change License. From the Change Date onward, the
+   Software may be used under the terms of the Change License.
+
+5. ATTRIBUTION
+
+   The "Hydra" name and the "Made by Elchi" attribution shall be retained in the
+   Software, its user interfaces, and its documentation. Any permitted use must
+   preserve all copyright notices.
+
+6. NO WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   LICENSOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM,
+   OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR ITS USE.
+
+7. TRANSFER AND ASSIGNMENT
+
+   The Licensor may at any time assign, transfer, sell, license, or otherwise
+   convey all or part of its rights, title, and interest in the Software and this
+   License to any third party. Such transfer does not terminate, reduce, or
+   otherwise affect this License, which remains in full force and binds all
+   successors and assignees. Upon transfer, the recipient becomes the Licensor
+   for all purposes of this License.
+
+8. TERMINATION
+
+   Any use of the Software in violation of this License automatically terminates
+   the rights granted herein.
+
+For permissions beyond the scope of this License, contact the Licensor.

@@ -1,0 +1,7 @@
+/hydra
+/hydractl
+/dist/
+*.log
+hydra.yaml
+brb.mp4
+*.sock

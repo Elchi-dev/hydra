@@ -1,0 +1,15 @@
+Hydra
+Copyright (c) 2026 Elchi. All rights reserved.
+Made by Elchi.
+
+This software is distributed under the Hydra Source-Available License.
+See the LICENSE file for terms. The license is not legal advice; consult a
+qualified professional for your specific situation.
+
+Third-party components:
+  github.com/yutopp/go-rtmp   (RTMP server)        BSL-1.0
+  github.com/yutopp/go-flv    (FLV mux/demux)      BSL-1.0
+  github.com/sirupsen/logrus  (logging dependency) MIT
+  gopkg.in/yaml.v3            (config parsing)     MIT / Apache-2.0
+
+ffmpeg is invoked as an external program and is not bundled with this software.
