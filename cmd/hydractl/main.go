@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/Elchi-dev/hydra/internal/build"
+	"github.com/Elchi-dev/hydra/internal/hardware"
 )
 
 func main() {
@@ -58,6 +59,8 @@ func main() {
 		err = c.toggle(args[1], cmd == "enable")
 	case "logs":
 		err = c.logs()
+	case "doctor":
+		err = c.doctor()
 	case "stop":
 		err = c.stop()
 	case "version", "--version", "-v":
@@ -82,6 +85,7 @@ func usage() {
   hydractl enable  <name>    enable a target (applies on next stream)
   hydractl disable <name>    disable a target
   hydractl logs              recent ffmpeg encoder output
+  hydractl doctor            hardware and encoder report with recommendations
   hydractl stop              stop the current session
 
 flags:
@@ -243,6 +247,17 @@ func (c *client) toggle(name string, enabled bool) error {
 	if res.NeedsRestart {
 		fmt.Println("note: a stream is live, stop & re-stream from OBS to apply this change")
 	}
+	return nil
+}
+
+func (c *client) doctor() error {
+	var res struct {
+		Hardware hardware.Info `json:"hardware"`
+	}
+	if err := c.get("/api/doctor", &res); err != nil {
+		return err
+	}
+	fmt.Print(res.Hardware.Report())
 	return nil
 }
 

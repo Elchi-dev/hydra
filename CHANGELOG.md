@@ -7,14 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Hardware detection of ffmpeg video encoders, hardware acceleration backends,
+  CPU model, core count, and memory
+- Verification probe that confirms which hardware encoders actually initialize on
+  the machine, so compiled-in encoders without a usable device are not reported
+  as available
+- `hydra -doctor` and `hydractl doctor` produce a hardware and encoder report
+  with qualitative recommendations
+- Doctor reports when ffmpeg is present but cannot run (broken or missing
+  install), instead of silently showing no encoders
+- Hardware summary logged at server startup
+
 ### Planned
 
-- Hardware-aware encoding with detection of NVENC, QSV, VAAPI, and software encoders
 - Setup wizard that probes the machine and recommends configuration without applying it
 - Benchmark command that reports realistic transcoding capacity for the host
+- Automatic per-target encoder selection using verified hardware encoders
 - Configurable CPU, thread, and memory limits
 - Isolated per-target workers with independent reconnect and per-target statistics
 - Native platform login so stream keys are retrieved instead of pasted
+- Server-side layout engine for per-target compositions such as vertical shorts
 - Notifications, recording targets, and metrics
 
 ## [0.1.0] - 2026-06-09

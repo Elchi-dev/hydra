@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Elchi-dev/hydra/internal/config"
+	"github.com/Elchi-dev/hydra/internal/hardware"
 	"github.com/Elchi-dev/hydra/internal/pipeline"
 	"github.com/Elchi-dev/hydra/internal/state"
 	"github.com/Elchi-dev/hydra/internal/web"
@@ -24,11 +25,12 @@ type Server struct {
 	mgr   *pipeline.Manager
 	store *state.Store
 	log   *slog.Logger
+	hw    *hardware.Info
 }
 
 // New builds the API server.
-func New(cfg *config.Config, mgr *pipeline.Manager, store *state.Store, log *slog.Logger) *Server {
-	return &Server{cfg: cfg, mgr: mgr, store: store, log: log}
+func New(cfg *config.Config, mgr *pipeline.Manager, store *state.Store, log *slog.Logger, hw *hardware.Info) *Server {
+	return &Server{cfg: cfg, mgr: mgr, store: store, log: log, hw: hw}
 }
 
 // Handler returns the configured HTTP mux.
@@ -43,6 +45,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/events", s.guard(s.handleEvents))
 	mux.HandleFunc("/api/config", s.guard(s.handleConfig))
 	mux.HandleFunc("/api/logs", s.guard(s.handleLogs))
+	mux.HandleFunc("/api/doctor", s.guard(s.handleDoctor))
 	mux.HandleFunc("/api/targets/toggle", s.guard(s.handleToggle))
 	mux.HandleFunc("/api/control/stop", s.guard(s.handleStop))
 
@@ -141,6 +144,13 @@ func (s *Server) handleConfig(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) handleLogs(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, map[string]any{"lines": s.mgr.Logs()})
+}
+
+func (s *Server) handleDoctor(w http.ResponseWriter, r *http.Request) {
+	writeJSON(w, map[string]any{
+		"hardware":        s.hw,
+		"recommendations": s.hw.Recommendations(),
+	})
 }
 
 func (s *Server) handleToggle(w http.ResponseWriter, r *http.Request) {

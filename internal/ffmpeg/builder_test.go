@@ -66,6 +66,11 @@ func TestPipelineWithRealFFmpeg(t *testing.T) {
 	if _, err := exec.LookPath("ffmpeg"); err != nil {
 		t.Skip("ffmpeg not installed")
 	}
+	// ffmpeg may be present but unable to start (missing shared libraries, etc.).
+	// That is an environment problem, not a code failure, so skip rather than fail.
+	if err := exec.Command("ffmpeg", "-hide_banner", "-version").Run(); err != nil {
+		t.Skipf("ffmpeg present but not runnable: %v", err)
+	}
 	dir := t.TempDir()
 
 	// 1) Generate a 3s test FLV (what the feeder would stream from OBS).

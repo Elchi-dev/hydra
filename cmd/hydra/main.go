@@ -20,6 +20,7 @@ import (
 	"github.com/Elchi-dev/hydra/internal/api"
 	"github.com/Elchi-dev/hydra/internal/build"
 	"github.com/Elchi-dev/hydra/internal/config"
+	"github.com/Elchi-dev/hydra/internal/hardware"
 	"github.com/Elchi-dev/hydra/internal/pipeline"
 	"github.com/Elchi-dev/hydra/internal/rtmpingest"
 	"github.com/Elchi-dev/hydra/internal/state"
@@ -28,10 +29,16 @@ import (
 func main() {
 	cfgPath := flag.String("config", "hydra.yaml", "path to config file")
 	showVersion := flag.Bool("version", false, "print version and exit")
+	doctor := flag.Bool("doctor", false, "print a hardware and encoder report, then exit")
 	flag.Parse()
 
 	if *showVersion {
 		fmt.Println(build.VersionLine())
+		return
+	}
+
+	if *doctor {
+		runDoctor(*cfgPath)
 		return
 	}
 
@@ -46,6 +53,13 @@ func main() {
 
 	log := newLogger(cfg.Logging.Level)
 
+	hw := hardware.Detect(cfg.Server.FFmpegPath)
+	log.Info("hardware detected",
+		"cores", hw.LogicalCores,
+		"encoders", len(hw.Encoders),
+		"hardware_encoder", hw.HasHardwareEncoder(),
+	)
+
 	store := state.New()
 	mgr := pipeline.NewManager(cfg, store, log)
 
@@ -57,7 +71,7 @@ func main() {
 	}
 
 	// HTTP API + dashboard.
-	apiSrv := api.New(cfg, mgr, store, log)
+	apiSrv := api.New(cfg, mgr, store, log, hw)
 	httpSrv := &http.Server{
 		Addr:    cfg.Server.HTTPListen,
 		Handler: apiSrv.Handler(),
@@ -129,6 +143,17 @@ func listenUnix(path string) (net.Listener, error) {
 	}
 	_ = os.Chmod(path, 0o660)
 	return ln, nil
+}
+
+// runDoctor prints a hardware and encoder report without starting the server.
+// It works even without a valid config, falling back to ffmpeg on PATH.
+func runDoctor(cfgPath string) {
+	ffmpegBin := "ffmpeg"
+	if cfg, err := config.Load(cfgPath); err == nil && cfg.Server.FFmpegPath != "" {
+		ffmpegBin = cfg.Server.FFmpegPath
+	}
+	fmt.Printf("%s %s  %s\n\n", build.Name, build.Version, build.Credit)
+	fmt.Print(hardware.Detect(ffmpegBin).Report())
 }
 
 func newLogger(level string) *slog.Logger {
