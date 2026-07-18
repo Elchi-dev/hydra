@@ -64,9 +64,19 @@ git clone https://github.com/Elchi-dev/hydra.git && cd hydra
 go build -o hydra    ./cmd/hydra
 go build -o hydractl ./cmd/hydractl
 
+./hydra -wizard             # generate a config interactively (writes only on confirm)
+# or copy and edit the example instead:
 cp config.example.yaml hydra.yaml
 $EDITOR hydra.yaml          # set stream_key, paste target keys
+
 ./hydra -config hydra.yaml
+```
+
+Diagnostics before going live:
+
+```sh
+./hydra -doctor            # detected CPU, encoders (verified), and recommendations
+./hydra -benchmark         # measured sustained transcoding capacity for this host
 ```
 
 In OBS set the server to `rtmp://<your-host>:1935/live/` and the stream key to

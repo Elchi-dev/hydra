@@ -59,7 +59,7 @@ func (i *Info) Recommendations() []string {
 		recs = append(recs, "High core count. Presets faster or fast are viable, with multiple 1080p60 targets in parallel.")
 	}
 
-	recs = append(recs, "Run the benchmark command for a measured capacity estimate on this machine.")
+	recs = append(recs, "Run `hydra -benchmark` for a measured capacity estimate on this machine.")
 	return recs
 }
 

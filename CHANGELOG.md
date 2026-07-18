@@ -19,17 +19,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Doctor reports when ffmpeg is present but cannot run (broken or missing
   install), instead of silently showing no encoders
 - Hardware summary logged at server startup
+- `hydra -benchmark` measures sustained concurrent transcoding capacity by
+  running real ffmpeg encodes and reporting how many streams hold real-time
+- `hydra -wizard` interactively generates a configuration from detected
+  hardware and writes it only after explicit confirmation
 
 ### Planned
 
-- Setup wizard that probes the machine and recommends configuration without applying it
-- Benchmark command that reports realistic transcoding capacity for the host
 - Automatic per-target encoder selection using verified hardware encoders
 - Configurable CPU, thread, and memory limits
 - Isolated per-target workers with independent reconnect and per-target statistics
+- Vertical and shorts support: full OBS vertical-plugin integration via
+  multi-key ingest, plus a server-side layout engine
 - Native platform login so stream keys are retrieved instead of pasted
-- Server-side layout engine for per-target compositions such as vertical shorts
 - Notifications, recording targets, and metrics
+- Polish and distribution: color terminal output, redesigned dashboard, and
+  packaging for apt, AUR, and an install script
 
 ## [0.1.0] - 2026-06-09
 

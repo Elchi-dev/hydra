@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/Elchi-dev/hydra/internal/api"
+	"github.com/Elchi-dev/hydra/internal/benchmark"
 	"github.com/Elchi-dev/hydra/internal/build"
 	"github.com/Elchi-dev/hydra/internal/config"
 	"github.com/Elchi-dev/hydra/internal/hardware"
@@ -30,6 +31,11 @@ func main() {
 	cfgPath := flag.String("config", "hydra.yaml", "path to config file")
 	showVersion := flag.Bool("version", false, "print version and exit")
 	doctor := flag.Bool("doctor", false, "print a hardware and encoder report, then exit")
+	bench := flag.Bool("benchmark", false, "measure transcoding capacity, then exit")
+	wizard := flag.Bool("wizard", false, "interactive setup to generate a config, then exit")
+	benchRes := flag.String("benchmark-res", "1920x1080", "benchmark resolution WxH")
+	benchFPS := flag.Int("benchmark-fps", 60, "benchmark frame rate")
+	benchPreset := flag.String("benchmark-preset", "veryfast", "benchmark x264 preset")
 	flag.Parse()
 
 	if *showVersion {
@@ -39,6 +45,16 @@ func main() {
 
 	if *doctor {
 		runDoctor(*cfgPath)
+		return
+	}
+
+	if *bench {
+		runBenchmark(*cfgPath, *benchRes, *benchFPS, *benchPreset)
+		return
+	}
+
+	if *wizard {
+		runWizard(*cfgPath)
 		return
 	}
 
@@ -143,6 +159,32 @@ func listenUnix(path string) (net.Listener, error) {
 	}
 	_ = os.Chmod(path, 0o660)
 	return ln, nil
+}
+
+// runBenchmark measures transcoding capacity for a profile and prints a report.
+func runBenchmark(cfgPath, res string, fps int, preset string) {
+	ffmpegBin := "ffmpeg"
+	if cfg, err := config.Load(cfgPath); err == nil && cfg.Server.FFmpegPath != "" {
+		ffmpegBin = cfg.Server.FFmpegPath
+	}
+
+	hw := hardware.Detect(ffmpegBin)
+	if !hw.FFmpegOK {
+		fmt.Fprintln(os.Stderr, "ffmpeg could not be run; fix the install first (see: hydra -doctor)")
+		os.Exit(1)
+	}
+
+	encoder := "libx264"
+	if e, ok := hw.BestEncoderFor("h264"); ok {
+		encoder = e.Name
+	}
+
+	fmt.Printf("%s %s  %s\n\n", build.Name, build.Version, build.Credit)
+	fmt.Printf("Benchmarking %s %dfps with %s. This runs several real encodes and takes about a minute...\n\n", res, fps, encoder)
+
+	profile := benchmark.Profile{Encoder: encoder, Resolution: res, FPS: fps, Preset: preset}
+	result := benchmark.Run(context.Background(), ffmpegBin, profile, benchmark.Options{})
+	fmt.Print(result.Report())
 }
 
 // runDoctor prints a hardware and encoder report without starting the server.
